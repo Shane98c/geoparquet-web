@@ -46,14 +46,30 @@ export default function FlatGeoBufDemo({ map }) {
     updateData();
 
     // Update data on map move
-    map.on("moveend", () => {
+    const moveEndHandler = () => {
       updateData();
-    });
+    };
+    map.on("moveend", moveEndHandler);
 
+    // Cleanup function
     return () => {
-      if (map.getLayer("buildings-fill")) map.removeLayer("buildings-fill");
-      if (map.getLayer("buildings-line")) map.removeLayer("buildings-line");
-      if (map.getSource("buildings")) map.removeSource("buildings");
+      try {
+        if (!map) return;
+        // Remove event listener first
+        map.off("moveend", moveEndHandler);
+        // Then remove layers and source
+        if (map.getLayer("buildings-fill")) {
+          map.removeLayer("buildings-fill");
+        }
+        if (map.getLayer("buildings-line")) {
+          map.removeLayer("buildings-line");
+        }
+        if (map.getSource("buildings")) {
+          map.removeSource("buildings");
+        }
+      } catch (error) {
+        console.log("Error during cleanup:", error);
+      }
     };
   }, [map]);
 

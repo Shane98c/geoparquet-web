@@ -4,6 +4,7 @@ import Map from "./components/Map";
 import QuadkeyDemo from "./components/QuadkeyDemo";
 import SingleParquetDemo from "./components/SingleParquetDemo";
 import FlatGeoBufDemo from "./components/FlatGeoBufDemo";
+import PmtilesDemo from "./components/PmtilesDemo";
 
 const Navigation = () => (
   <nav style={{ padding: "1rem", backgroundColor: "#f0f0f0" }}>
@@ -24,6 +25,9 @@ const Navigation = () => (
       </li>
       <li>
         <Link to="/flatgeobuf">FlatGeobuf Demo</Link>
+      </li>
+      <li>
+        <Link to="/pmtiles">PMTiles Demo</Link>
       </li>
     </ul>
   </nav>
@@ -62,6 +66,17 @@ const FlatGeobufPage = () => (
   </div>
 );
 
+const PmtilesPage = () => (
+  <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Navigation />
+    <div style={{ flex: 1 }}>
+      <Map>
+        <PmtilesDemo />
+      </Map>
+    </div>
+  </div>
+);
+
 function App() {
   return (
     <Router>
@@ -70,6 +85,7 @@ function App() {
         <Route path="/quadkey" element={<QuadkeyPage />} />
         <Route path="/singleparquet" element={<SingleParquetPage />} />
         <Route path="/flatgeobuf" element={<FlatGeobufPage />} />
+        <Route path="/pmtiles" element={<PmtilesPage />} />
       </Routes>
     </Router>
   );

@@ -16,6 +16,7 @@
     "@geoarrow/deck.gl-layers": "^0.3.0-beta.17",
     "@geoarrow/geoarrow-js": "^0.3.1",
     "@geoarrow/geoparquet-wasm": "^0.2.0-beta.5",
+    "@protomaps/basemaps": "^5.1.0",
     "apache-arrow": "^19.0.0",
     "flatgeobuf": "^4.0.0",
     "maplibre-gl": "^5.1.0",
