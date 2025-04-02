@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Map from "./components/Map";
 import QuadkeyDemo from "./components/QuadkeyDemo";
 import SingleParquetDemo from "./components/SingleParquetDemo";
+import FlatGeoBufDemo from "./components/FlatGeoBufDemo";
 
 const Navigation = () => (
   <nav style={{ padding: "1rem", backgroundColor: "#f0f0f0" }}>
@@ -55,7 +56,7 @@ const FlatGeobufPage = () => (
     <Navigation />
     <div style={{ flex: 1 }}>
       <Map>
-        <div>FlatGeobuf Demo Coming Soon</div>
+        <FlatGeoBufDemo />
       </Map>
     </div>
   </div>
