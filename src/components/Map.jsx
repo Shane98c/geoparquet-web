@@ -1,54 +1,39 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Map as MapLibre } from "maplibre-gl";
-import { MapboxOverlay } from "@deck.gl/mapbox";
+import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 export default function Map({ children }) {
-  const deckOverlayRef = useRef(null);
-  const mapRef = useRef(null);
-  const [isMapReady, setIsMapReady] = useState(false);
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   useEffect(() => {
-    const map = new MapLibre({
-      container: "map",
+    if (!mapContainer.current) return;
+
+    map.current = new maplibregl.Map({
+      container: mapContainer.current,
       style: "https://demotiles.maplibre.org/style.json",
-      center: [-111.5, 39],
-      zoom: 6,
+      center: [-118.2437, 34.0522],
+      zoom: 9,
     });
 
-    const overlay = new MapboxOverlay({
-      interleaved: true,
-      layers: [],
-    });
-    map.addControl(overlay);
-
-    deckOverlayRef.current = overlay;
-    mapRef.current = map;
-
-    map.on("load", () => {
-      setIsMapReady(true);
+    map.current.on("load", () => {
+      console.log("Map loaded");
+      setIsMapLoaded(true);
     });
 
     return () => {
-      map.remove();
+      map.current?.remove();
     };
   }, []);
 
-  // Clone children with map and overlay props
-  const childrenWithProps = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, {
-        map: mapRef.current,
-        overlay: deckOverlayRef.current,
-      });
-    }
-    return child;
-  });
-
   return (
-    <div style={{ width: "100vw", height: "100vh", position: "relative" }}>
-      <div id="map" style={{ width: "100%", height: "100%" }} />
-      {isMapReady && childrenWithProps}
+    <div ref={mapContainer} style={{ width: "100%", height: "100%" }}>
+      {isMapLoaded &&
+        map.current &&
+        React.Children.map(children, (child) =>
+          React.cloneElement(child, { map: map.current })
+        )}
     </div>
   );
 }

@@ -4,66 +4,64 @@ import Map from "./components/Map";
 import QuadkeyDemo from "./components/QuadkeyDemo";
 import SingleParquetDemo from "./components/SingleParquetDemo";
 
-function Navigation() {
-  return (
-    <nav
+const Navigation = () => (
+  <nav style={{ padding: "1rem", backgroundColor: "#f0f0f0" }}>
+    <ul
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        background: "rgba(255, 255, 255, 0.9)",
-        padding: "10px",
+        listStyle: "none",
         display: "flex",
-        gap: "20px",
+        gap: "1rem",
+        margin: 0,
+        padding: 0,
       }}
     >
-      <Link to="/quadkey">Quadkey Demo</Link>
-      <Link to="/singleparquet">Single Parquet Demo</Link>
-      <Link to="/flatgeobuf">FlatGeobuf Demo</Link>
-    </nav>
-  );
-}
+      <li>
+        <Link to="/quadkey">Quadkey Demo</Link>
+      </li>
+      <li>
+        <Link to="/singleparquet">Single Parquet Demo</Link>
+      </li>
+      <li>
+        <Link to="/flatgeobuf">FlatGeobuf Demo</Link>
+      </li>
+    </ul>
+  </nav>
+);
 
-function QuadkeyPage() {
-  return (
-    <Map>
-      <Navigation />
-      <QuadkeyDemo />
-    </Map>
-  );
-}
+const QuadkeyPage = () => (
+  <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Navigation />
+    <div style={{ flex: 1 }}>
+      <Map>
+        <QuadkeyDemo />
+      </Map>
+    </div>
+  </div>
+);
 
-function SingleParquetPage() {
-  return (
-    <Map>
-      <Navigation />
-      <SingleParquetDemo />
-    </Map>
-  );
-}
+const SingleParquetPage = () => (
+  <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Navigation />
+    <div style={{ flex: 1 }}>
+      <Map>
+        <SingleParquetDemo />
+      </Map>
+    </div>
+  </div>
+);
 
-function FlatGeobufPage() {
-  return (
-    <Map>
-      <Navigation />
-      <div
-        style={{
-          position: "absolute",
-          top: "50px",
-          left: "10px",
-          background: "white",
-          padding: "10px",
-        }}
-      >
-        FlatGeobuf Demo (Coming Soon)
-      </div>
-    </Map>
-  );
-}
+const FlatGeobufPage = () => (
+  <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Navigation />
+    <div style={{ flex: 1 }}>
+      <Map>
+        <div>FlatGeobuf Demo Coming Soon</div>
+      </Map>
+    </div>
+  </div>
+);
 
-export default function App() {
+function App() {
   return (
     <Router>
       <Routes>
@@ -75,3 +73,5 @@ export default function App() {
     </Router>
   );
 }
+
+export default App;

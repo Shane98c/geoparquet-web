@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  ParquetFile,
-  ParquetDataset,
-  set_panic_hook,
-} from "@geoarrow/geoparquet-wasm";
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import { ParquetDataset, set_panic_hook } from "@geoarrow/geoparquet-wasm";
 import { tableFromIPC } from "apache-arrow";
 import { GeoArrowPolygonLayer } from "@geoarrow/deck.gl-layers";
 
@@ -15,6 +12,7 @@ const QUADKEY_ZOOM = 13;
 
 function calculateQuadkeys(map, targetZoom = QUADKEY_ZOOM) {
   if (map.getZoom() < MIN_ZOOM) {
+    console.log("Zoom level below minimum, returning empty quadkeys");
     return [];
   }
   // Get the current map bounds
@@ -58,27 +56,52 @@ function calculateQuadkeys(map, targetZoom = QUADKEY_ZOOM) {
     }
   }
 
+  console.log("Calculated quadkeys:", quadkeys);
   return quadkeys;
 }
 
-export default function QuadkeyDemo({ map, overlay }) {
+export default function QuadkeyDemo({ map }) {
+  console.log("QuadkeyDemo rendered with map:", map);
   const parquetRef = useRef(null);
+  const overlayRef = useRef(null);
   const [quadkeys, setQuadkeys] = useState([]);
 
   useEffect(() => {
-    if (!map) return;
+    if (!map) {
+      console.log("Map not available yet");
+      return;
+    }
+
+    // Set up deck.gl overlay
+    const overlay = new MapboxOverlay({
+      interleaved: true,
+      layers: [],
+    });
+    map.addControl(overlay);
+    overlayRef.current = overlay;
+    console.log("Added deck.gl overlay to map");
 
     // Initial data load
     const initialQuadkeys = calculateQuadkeys(map);
+    console.log("Initial quadkeys:", initialQuadkeys);
     setQuadkeys(initialQuadkeys);
 
     map.on("moveend", () => {
       const newQuadkeys = calculateQuadkeys(map);
+      console.log("New quadkeys after move:", newQuadkeys);
       setQuadkeys(newQuadkeys);
     });
+
+    return () => {
+      console.log("Cleaning up QuadkeyDemo");
+      if (overlayRef.current) {
+        map.removeControl(overlayRef.current);
+      }
+    };
   }, [map]);
 
   useEffect(() => {
+    console.log("Quadkeys changed:", quadkeys);
     const setParquet = async () => {
       if (!quadkeys || quadkeys.length === 0) {
         console.log("No quadkeys found, skipping fetch");
@@ -126,14 +149,15 @@ export default function QuadkeyDemo({ map, overlay }) {
   }, [quadkeys, map]);
 
   async function updateData() {
-    if (!map || !parquetRef.current) {
-      console.log("Map or parquet not available yet");
+    console.log("updateData called");
+    if (!map || !parquetRef.current || !overlayRef.current) {
+      console.log("Map, overlay, or parquet not available yet");
       return;
     }
 
     if (map.getZoom() < MIN_ZOOM) {
       console.log("Zoom level below minimum, clearing layers");
-      overlay?.setProps({ layers: [] });
+      overlayRef.current.setProps({ layers: [] });
       return;
     }
 
@@ -172,7 +196,7 @@ export default function QuadkeyDemo({ map, overlay }) {
         pickable: true,
       });
 
-      overlay?.setProps({
+      overlayRef.current.setProps({
         layers: [polygonLayer],
       });
 

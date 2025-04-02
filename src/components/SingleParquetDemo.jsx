@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { MapboxOverlay } from "@deck.gl/mapbox";
 import { ParquetFile, set_panic_hook } from "@geoarrow/geoparquet-wasm";
 import { tableFromIPC } from "apache-arrow";
 import { GeoArrowPolygonLayer } from "@geoarrow/deck.gl-layers";
@@ -8,14 +9,23 @@ const BASE_URL =
 
 const MIN_ZOOM = 13;
 
-export default function SingleParquetDemo({ map, overlay }) {
+export default function SingleParquetDemo({ map }) {
   const parquetRef = useRef(null);
+  const overlayRef = useRef(null);
 
   useEffect(() => {
-    if (!map || !overlay) {
-      console.log("Map or overlay not available yet");
+    if (!map) {
+      console.log("Map not available yet");
       return;
     }
+
+    // Set up deck.gl overlay
+    const overlay = new MapboxOverlay({
+      interleaved: true,
+      layers: [],
+    });
+    map.addControl(overlay);
+    overlayRef.current = overlay;
 
     const fetchParquetMeta = async () => {
       if (parquetRef.current) {
@@ -40,17 +50,23 @@ export default function SingleParquetDemo({ map, overlay }) {
     map.on("moveend", () => {
       updateData();
     });
-  }, [map, overlay]);
+
+    return () => {
+      if (overlayRef.current) {
+        map.removeControl(overlayRef.current);
+      }
+    };
+  }, [map]);
 
   async function updateData() {
-    if (!map || !parquetRef.current || !overlay) {
+    if (!map || !parquetRef.current || !overlayRef.current) {
       console.log("Map, overlay, or parquet not available yet");
       return;
     }
 
     if (map.getZoom() < MIN_ZOOM) {
       console.log("Zoom level below minimum, clearing layers");
-      overlay.setProps({ layers: [] });
+      overlayRef.current.setProps({ layers: [] });
       return;
     }
 
@@ -89,7 +105,7 @@ export default function SingleParquetDemo({ map, overlay }) {
         pickable: true,
       });
 
-      overlay.setProps({
+      overlayRef.current.setProps({
         layers: [polygonLayer],
       });
 
